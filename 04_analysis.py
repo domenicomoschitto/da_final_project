@@ -6,9 +6,17 @@ import matplotlib.pyplot as plt
 import seaborn as sns 
 
 df = pd.read_csv("data/merged.csv")
-df = df.dropna(subset=["acc_per_capita", "acc_per_kmq"])
+df = df.dropna(subset=["acc_per_capita"])
 
-X = df[["acc_per_capita", "acc_per_kmq"]]
+df = df.groupby("municipality_code").agg({
+    "accidents": "sum",
+    "population": "first",
+    "area_kmq": "first", 
+    "acc_per_capita": "mean", 
+    "acc_per_kmq": "mean"
+}).reset_index()
+
+X = df[["acc_per_capita", "acc_per_kmq"]].fillna(0)
 scaler = MinMaxScaler()
 X_scaled = scaler.fit_transform(X)
 
